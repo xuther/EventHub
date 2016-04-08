@@ -1,0 +1,4 @@
+{
+  "MongoDBAddress": "localhost",
+  "MongoProviderDBName": "providers"
+}
