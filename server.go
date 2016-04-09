@@ -141,6 +141,7 @@ func main() {
 	goji.Post("/api/provider", registerProvider)
 	//goji.Get("/api/provider", getProviders)
 	goji.Post("/api/provider/:providerID/events", registerEvent)
+	goji.Post("/api/provider/:providerID/events/:eventID/subscribe", subscribeToEvent)
 
 	goji.Serve()
 	//err := http.ListenAndServeTLS(":"+strconv.Itoa(*port), "server.pem", "server.key", nil)

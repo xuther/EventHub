@@ -14,11 +14,34 @@ type publicProvider struct {
 }
 
 type event struct {
-	ID          int
+	ID          bson.ObjectId `bson:"_id" json:"omitempty"`
 	Name        string
 	Description string
-	Subscribers []bson.ObjectId  `json:"-"`
+	Subscribers []subscription   `json:"-"`
 	History     []eventOccurance `json:"-"`
+}
+
+type subscription struct {
+	ID           bson.ObjectId `bson:"_id" json:"-"`
+	Name         string
+	SubscriberID string //Hex strings of the mongo ID's
+	ActionID     string //Hex Strings of the mongo ID's
+}
+
+type subscriberAction struct {
+	ID          bson.ObjectId `bson:"_id"`
+	Name        string
+	Description string
+	Action      string
+	Info        []string //Depending on the action this will be a phone #, e-mail address, or webhook to call, or other information.
+}
+
+type user struct {
+	ID            bson.ObjectId `bson:"_id"`
+	Name          string
+	Subscriptions []subscriberAction
+	Username      string
+	Password      []byte
 }
 
 type eventOccurance struct {
@@ -31,11 +54,10 @@ type registerEventInfo struct {
 
 //TODO Make ID go away in json
 type provider struct {
-	ID             bson.ObjectId `bson:"_id" json:"omitempty"`
-	EventIDCounter int           `json:"-"`
-	Name           string
-	Type           string
-	Description    string
-	Secret         string  `json:"omitempty"`
-	Events         []event `json:"omitempty"`
+	ID          bson.ObjectId `bson:"_id,omitempty" json:"omitempty"`
+	Name        string
+	Type        string
+	Description string
+	Secret      string  `json:"omitempty"`
+	Events      []event `json:"omitempty"`
 }

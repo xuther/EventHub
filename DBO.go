@@ -35,6 +35,44 @@ func addProvider(prov *provider) error {
 	return nil
 }
 
+func getEventByID(eventID string, providerID string) (event, error) {
+	fmt.Printf("\nGetting the event corresponding to ID: %s:%s \n", providerID, eventID)
+
+	var toReturn = event{}
+	var prov = provider{}
+
+	if !bson.IsObjectIdHex(providerID) || !bson.IsObjectIdHex(eventID) {
+		return toReturn, errors.New("Invalid ID format\n")
+	}
+	session, err := mgo.Dial(configuration.MongoDBAddress)
+
+	if err != nil {
+		return toReturn, err
+	}
+
+	defer session.Close()
+
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB(configuration.MongoProviderDBName).C("Providers")
+
+	if err != nil {
+		return toReturn, err
+	}
+
+	//TODO: Figure out how to do this in one step.
+	count, err := c.Find(bson.M{"_id": bson.ObjectIdHex(providerID), "events._id": bson.ObjectIdHex(eventID)}).Count()
+
+	if err != nil {
+		return toReturn, err
+	}
+	if count < 1 {
+		return toReturn, errors.New("Invalid ID.")
+	}
+	c.Find(bson.M{"_id": bson.ObjectIdHex(providerID), "events._id": bson.ObjectIdHex(eventID)}).Select(bson.M{"events.$": 1}).One(&prov)
+
+	return prov.Events[0], nil
+}
+
 func getProviderByID(providerID string) (provider, error) {
 	fmt.Printf("Getting the provider corresponding to ID: %s \n", providerID)
 
@@ -88,5 +126,25 @@ func updateProvider(prov *provider) error {
 	}
 
 	fmt.Println("Done")
+	return nil
+}
+
+func insertEvent(event string, provider string, sub *subscription) error {
+	fmt.Printf("Inserting a subscription provider %s...\n", sub.Name)
+
+	session, err := mgo.Dial(configuration.MongoDBAddress)
+
+	if err != nil {
+		return err
+	}
+
+	defer session.Close()
+
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB(configuration.MongoProviderDBName).C("Providers")
+
+	sub.ID = bson.NewObjectId()
+
+	c.Update(bson.M{"events._id": bson.ObjectIdHex(event)}, bson.M{"$addToSet": bson.M{"events.$.subscribers": sub}})
 	return nil
 }

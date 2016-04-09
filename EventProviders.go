@@ -89,7 +89,7 @@ func registerEvent(c web.C, w http.ResponseWriter, r *http.Request) {
 	}
 
 	prov.ID = bson.ObjectIdHex(providerID)
-  
+
 	//TODO: check for duplicate events.
 	var eventWrapper = registerEventInfo{}
 	bits, err := ioutil.ReadAll(r.Body)
@@ -123,9 +123,8 @@ func registerEvent(c web.C, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	eventToAdd.ID = prov.EventIDCounter
+	eventToAdd.ID = bson.NewObjectId()
 	prov.Events = append(prov.Events, eventToAdd)
-	prov.EventIDCounter++
 
 	err = updateProvider(&prov)
 
