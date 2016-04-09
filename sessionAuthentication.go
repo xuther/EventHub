@@ -27,11 +27,6 @@ type userInformationWithID struct {
 	ID       bson.ObjectId `bson:"_id"`
 }
 
-type loginInformation struct {
-	Username string
-	Password string
-}
-
 type sessionInfo struct {
 	SessionKey string
 	UserID     string

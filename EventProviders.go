@@ -41,11 +41,7 @@ func registerProvider(w http.ResponseWriter, r *http.Request) {
 
 	hasName, err := checkProviderNameInUse(prov.Name)
 
-	if err != nil {
-		sendGenericError(w)
-		fmt.Printf("Error: %s\n", err.Error())
-		return
-	}
+	checkSendError(w, err)
 
 	if hasName {
 		w.WriteHeader(http.StatusBadRequest)
@@ -53,24 +49,16 @@ func registerProvider(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	prov.Secret, err = getProviderSecret(prov)
+	prov.Secret, err = getSecret()
 
-	if err != nil {
-		sendGenericError(w)
-		fmt.Printf("Error: %s\n", err.Error())
-		return
-	}
+	checkSendError(w, err)
 
 	var events []event
 	prov.Events = events
 
 	err = addProvider(&prov)
 
-	if err != nil {
-		sendGenericError(w)
-		fmt.Printf("Error: %s\n", err.Error())
-		return
-	}
+	checkSendError(w, err)
 
 	fmt.Fprintf(w, "{\"Message\":\"Success\",\"Secret\":\"%s\",\"ID\":\"%s\"}", prov.Secret, prov.ID.Hex())
 }
@@ -128,11 +116,7 @@ func registerEvent(c web.C, w http.ResponseWriter, r *http.Request) {
 
 	err = updateProvider(&prov)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "Error occured: %s\n", err.Error())
-		return
-	}
+	checkSendError(w, err)
 
 	ev, _ := json.Marshal(prov.Events[len(prov.Events)-1])
 	fmt.Fprintf(w, "%s", ev)
@@ -142,7 +126,7 @@ func registerEvent(c web.C, w http.ResponseWriter, r *http.Request) {
 
 //TODO: Find a better way to generate a secret that can be uniqe.
 //At least investigate
-func getProviderSecret(p provider) (string, error) {
+func getSecret() (string, error) {
 	b := make([]byte, 100)
 	_, err := rand.Read(b)
 
@@ -151,9 +135,4 @@ func getProviderSecret(p provider) (string, error) {
 	}
 
 	return base64.URLEncoding.EncodeToString(b), nil
-}
-
-func sendGenericError(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusInternalServerError)
-	fmt.Fprintf(w, "An error occurred.")
 }
