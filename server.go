@@ -11,6 +11,7 @@ import (
 )
 
 var configuration config
+var eventChannel chan eventFireInformation
 
 func takeAction(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Taking Action")
@@ -130,6 +131,10 @@ func main() {
 	flag.Parse()
 
 	configuration = importConfig(*c)
+	//event buffer
+	eventChannel = make(chan eventFireInformation, 100)
+
+	go eventHandler(eventChannel)
 
 	//Front end actions
 	http.Handle("/site", http.StripPrefix("/", http.FileServer(http.Dir("Static/"))))
@@ -138,11 +143,13 @@ func main() {
 	goji.Post("/api/register", registerHandle)
 
 	//actions for event registry
-	goji.Post("/api/provider", registerProvider)
-	//goji.Get("/api/provider", getProviders)
+	goji.Post("/api/providers", registerProvider)
 	goji.Post("/api/providers/:providerID/events", registerEvent)
 	goji.Post("/api/providers/:providerID/events/:eventID/subscribe", subscribeToEvent)
+	goji.Post("/api/providers/:providerID/events/:eventID/fire", fireEvent)
+	goji.Get("/api/providers", getAllProviders)
 
+	goji.Get("/api/users", getAllUsers)
 	goji.Post("/api/users", registerUser)
 	goji.Post("/api/users/:userID/channels", addUserNotificationChannel)
 

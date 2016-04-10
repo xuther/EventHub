@@ -129,6 +129,50 @@ func updateProvider(prov *provider) error {
 	return nil
 }
 
+func getSubscriptions(eventID string, providerID string) ([]subscription, error) {
+
+	var subs []subscription
+	fmt.Printf("Getting all the subscriptions of %s...\n", eventID)
+
+	session, err := mgo.Dial(configuration.MongoDBAddress)
+
+	if err != nil {
+		return subs, err
+	}
+
+	defer session.Close()
+
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB(configuration.MongoProviderDBName).C("Providers")
+
+	c.Find(bson.M{"events._id": bson.ObjectIdHex(eventID)}).All(&subs)
+
+	return subs, nil
+}
+
+func getProviders() ([]provider, error) {
+	fmt.Printf("Getting all the users...\n")
+
+	var p []provider
+
+	session, err := mgo.Dial(configuration.MongoDBAddress)
+
+	if err != nil {
+		return p, err
+	}
+
+	defer session.Close()
+
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB(configuration.MongoProviderDBName).C("Providers")
+
+	c.Find(bson.M{}).All(&p)
+
+	fmt.Printf("\nProvider:\n%+v", p)
+
+	return p, nil
+}
+
 func insertEvent(event string, provider string, sub *subscription) error {
 	fmt.Printf("Inserting a subscription provider %s...\n", sub.Name)
 

@@ -63,6 +63,22 @@ func registerProvider(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "{\"Message\":\"Success\",\"Secret\":\"%s\",\"ID\":\"%s\"}", prov.Secret, prov.ID.Hex())
 }
 
+func getAllProviders(c web.C, w http.ResponseWriter, r *http.Request) {
+	providers, err := getProviders()
+
+	checkSendError(w, err)
+
+	for indx := range providers {
+		providers[indx].Secret = ""
+	}
+
+	s, err := json.Marshal(providers)
+
+	checkSendError(w, err)
+
+	w.Write(s)
+}
+
 func registerEvent(c web.C, w http.ResponseWriter, r *http.Request) {
 	providerID := c.URLParams["providerID"]
 
@@ -135,4 +151,30 @@ func getSecret() (string, error) {
 	}
 
 	return base64.URLEncoding.EncodeToString(b), nil
+}
+
+func fireEvent(c web.C, w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("Firing event...\n")
+	providerID := c.URLParams["providerID"]
+	eventID := c.URLParams["eventID"]
+
+	//TODO:
+	ev, err := getEventByID(eventID, providerID)
+	subs := ev.Subscribers
+
+	checkSendError(w, err)
+
+	fmt.Printf("Subscribers: %+v\n", subs)
+	bits, err := ioutil.ReadAll(r.Body)
+
+	var strs []string
+
+	strs = append(strs, string(bits))
+
+	occr := eventOccurance{EventInformation: strs}
+
+	toSend := eventFireInformation{eventID: eventID, providerID: providerID, occurance: occr, Subscriptions: subs}
+
+	eventChannel <- toSend
+
 }

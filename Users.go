@@ -119,6 +119,22 @@ func addUserNotificationChannel(c web.C, w http.ResponseWriter, r *http.Request)
 	return
 }
 
+func getAllUsers(c web.C, w http.ResponseWriter, r *http.Request) {
+	users, err := getUsers()
+
+	checkSendError(w, err)
+
+	for indx := range users {
+		users[indx].Secret = ""
+	}
+
+	s, err := json.Marshal(users)
+
+	checkSendError(w, err)
+
+	w.Write(s)
+}
+
 func checkSendError(w http.ResponseWriter, err error) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

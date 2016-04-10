@@ -62,6 +62,46 @@ func getUserByID(userID string) (user, error) {
 	return toReturn, nil
 }
 
+func getUsers() ([]user, error) {
+	fmt.Printf("Getting all the users...\n")
+
+	var u []user
+
+	session, err := mgo.Dial(configuration.MongoDBAddress)
+
+	if err != nil {
+		return u, err
+	}
+
+	defer session.Close()
+
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB(configuration.MongoProviderDBName).C("Users")
+
+	c.Find(bson.M{}).All(&u)
+
+	return u, nil
+}
+
+func getNotificationChannel(userID string, notificationChannelID string) (user, error) {
+	var toReturn user
+
+	session, err := mgo.Dial(configuration.MongoDBAddress)
+
+	if err != nil {
+		return toReturn, err
+	}
+
+	defer session.Close()
+
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB(configuration.MongoProviderDBName).C("Users")
+
+	c.Find(bson.M{"notificationchannels._id": bson.ObjectIdHex(notificationChannelID)}).Select(bson.M{"notificationchannels.$": 1}).One(&toReturn)
+
+	return toReturn, nil
+}
+
 func updateUser(usr *user) error {
 	fmt.Printf("Updating user %s...\n", usr.Name)
 

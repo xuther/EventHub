@@ -14,7 +14,7 @@ type publicProvider struct {
 }
 
 type event struct {
-	ID          bson.ObjectId `bson:"_id" json:"omitempty"`
+	ID          bson.ObjectId `bson:"_id"`
 	Name        string
 	Description string
 	Subscribers []subscription   `json:"-"`
@@ -44,6 +44,15 @@ type user struct {
 }
 
 type eventOccurance struct {
+	ID               bson.ObjectId `bson:"_id"`
+	EventInformation []string
+}
+
+type eventFireInformation struct {
+	eventID       string
+	providerID    string
+	occurance     eventOccurance
+	Subscriptions []subscription
 }
 
 type notificationChannel struct {
@@ -66,10 +75,10 @@ type registerEventInfo struct {
 
 //TODO Make ID go away in json
 type provider struct {
-	ID          bson.ObjectId `bson:"_id,omitempty" json:"omitempty"`
+	ID          bson.ObjectId `bson:"_id,omitempty"`
 	Name        string
 	Type        string
 	Description string
-	Secret      string  `json:"omitempty"`
-	Events      []event `json:"omitempty"`
+	Secret      string
+	Events      []event
 }
