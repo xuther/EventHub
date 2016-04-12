@@ -130,6 +130,8 @@ func registerEvent(c web.C, w http.ResponseWriter, r *http.Request) {
 	eventToAdd.ID = bson.NewObjectId()
 	prov.Events = append(prov.Events, eventToAdd)
 
+	fmt.Printf("Provider: %+v\n", prov)
+
 	err = updateProvider(&prov)
 
 	checkSendError(w, err)
