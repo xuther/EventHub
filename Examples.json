@@ -1,0 +1,60 @@
+goji.Post("/api/providers", registerProvider)
+{
+  "Name": "Test1",
+  "Type": "Testing.",
+  "Description": "I'm just here to test!"
+}
+
+
+goji.Post("/api/providers/:providerID/events", registerEvent)
+{
+  "Event": {
+      "Name": "Yo, I'm testing.",
+      "Description": "Don't worry about it."
+  },
+  "Secret": "lO9FuZaQ63GVM_vwPv7-ntmH80CzkJRort7RinUPXr6j7gePqsPdn06OCrWvz0VQMda3PeX83JxtGYX4sc3C7_m0dveeT59kpBVyXfAtZTmPOB60jZIvtvR72sos6Ec1J4_w4Q=="
+}
+
+
+goji.Post("/api/providers/:providerID/events/:eventID/subscribe", subscribeTovent)
+{
+  "Name": "Test Google Calendar",
+  "SubscriberID": "570c3056b58781ac7dd7800a",
+  "NotificationChannelID": "570c38a8b58781b5b077fe11"
+}
+
+//
+goji.Post("/api/providers/:providerID/events/:eventID/fire", fireEvent)
+{
+ "EventInformation": [
+   "Summary",
+   "Description",
+   "Start DateTime (RFC3339)",
+   "End DateTime (RFC3339)",
+   "Location"
+ ]
+}
+
+//get list of providers
+goji.Get("/api/providers", getAllProviders)
+
+
+goji.Get("/api/users", getAllUsers
+//Get all users
+
+goji.Post("/api/users", registerUser)
+  {
+      "Name":"Joe Test",
+      "Username": "test",
+      "Password": "test"
+  }
+
+
+goji.Post("/api/users/:userID/channels", addUserNotificationChannel)
+//
+
+goji.Get("/api/OathTokenRedirect", saveOauthToken)
+//redirect
+
+goji.Get("/api/getoauthredirect/:userID", getOathToken)
+//Get the oauth string to go to.
