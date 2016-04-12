@@ -44,6 +44,7 @@ func eventHandler(events <-chan eventFireInformation) {
 func addToGoogleCalendar(chanToSend notificationChannel, occurance eventOccurance) {
 	fmt.Println("Adding event to calendar")
 
+	fmt.Printf("What we get in the event occurance: ")
 	config := getConfig()
 	token := chanToSend.GoogleCalendarToken
 	ctx := context.Background()

@@ -167,14 +167,19 @@ func fireEvent(c web.C, w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Subscribers: %+v\n", subs)
 	bits, err := ioutil.ReadAll(r.Body)
 
-	var strs []string
+	var occr eventOccurance
 
-	strs = append(strs, string(bits))
+	err = json.Unmarshal(bits, &occr)
 
-	occr := eventOccurance{EventInformation: strs}
+	check(err)
+
+	fmt.Printf("Item %+v\n", occr)
+
+	fmt.Printf("Raw item %s\n", bits)
 
 	toSend := eventFireInformation{eventID: eventID, providerID: providerID, occurance: occr, Subscriptions: subs}
 
 	eventChannel <- toSend
 
+	fmt.Fprintf(w, "Event was added to queue.")
 }
