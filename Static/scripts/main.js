@@ -54,7 +54,7 @@ loginCall = function(username, password)
    })
 }
 
-redirectToOath = function(data) {
+redirectToOauth = function(data) {
   //CHANGE FROM LOCALHOST
   window.location.href= 'https://foursquare.com/oauth2/authenticate' +
     "?client_id=5ATHFEOTK5EU23DGQXCJ4XHYF1OWTBDIIV2CHXBAYQN0X5IO"+
@@ -67,7 +67,7 @@ getToken = function() {
 
   $.ajax({
     type: "GET",
-    url: "api/getOathToken" + window.location.search,
+    url: "api/getOauthToken" + window.location.search,
     contentType: "application/json;charset=utf-8"
   }).always(
   function(data) {
