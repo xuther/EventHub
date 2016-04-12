@@ -153,8 +153,8 @@ func main() {
 	goji.Post("/api/users", registerUser)
 	goji.Post("/api/users/:userID/channels", addUserNotificationChannel)
 
-	goji.Get("/api/OathTokenRedirect", saveOauthToken)
-	goji.Get("/api/getoauthredirect/:userID", getOathToken)
+	goji.Get("/api/OauthTokenRedirect", saveOauthToken)
+	goji.Get("/api/getoauthredirect/:userID", getOauthToken)
 
 	goji.Serve()
 	//err := http.ListenAndServeTLS(":"+strconv.Itoa(*port), "server.pem", "server.key", nil)
