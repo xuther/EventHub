@@ -3,7 +3,12 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"net/http"
+
+	"google.golang.org/api/calendar/v3"
+
+	"golang.org/x/net/context"
 )
 
 func eventHandler(events <-chan eventFireInformation) {
@@ -29,9 +34,48 @@ func eventHandler(events <-chan eventFireInformation) {
 			switch user.NotificationChannels[0].NotificationType {
 			case "webhook":
 				fireWebhoock(user.NotificationChannels[0], ev.occurance)
+			case "googlecalendar":
+				addToGoogleCalendar(user.NotificationChannels[0], ev.occurance)
 			}
 		}
 	}
+}
+
+func addToGoogleCalendar(chanToSend notificationChannel, occurance eventOccurance) {
+	fmt.Println("Adding event to calendar")
+
+	config := getConfig()
+	token := chanToSend.GoogleCalendarToken
+	ctx := context.Background()
+
+	client := config.Client(ctx, &token)
+
+	srv, err := calendar.New(client)
+
+	if err != nil {
+		log.Fatalf("Unable to retrieve calendar Client %v", err)
+	}
+
+	event := &calendar.Event{
+		Summary:     occurance.EventInformation[0],
+		Description: occurance.EventInformation[1],
+		Start: &calendar.EventDateTime{
+			DateTime: occurance.EventInformation[2],
+			TimeZone: "America/Denver",
+		},
+		End: &calendar.EventDateTime{
+			DateTime: occurance.EventInformation[3],
+			TimeZone: "America/Denver",
+		},
+		Location: occurance.EventInformation[4],
+	}
+
+	event, err = srv.Events.Insert("primary", event).Do()
+
+	if err != nil {
+		log.Fatalf("Unable to create event. %v\n", err)
+	}
+	fmt.Printf("Event created: %s\n", event.HtmlLink)
 }
 
 //There's got to be a better way to do this. But I can't think of it without

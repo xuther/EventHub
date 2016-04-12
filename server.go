@@ -137,7 +137,7 @@ func main() {
 	go eventHandler(eventChannel)
 
 	//Front end actions
-	http.Handle("/site", http.StripPrefix("/", http.FileServer(http.Dir("Static/"))))
+	http.Handle("/site/", http.StripPrefix("/site", http.FileServer(http.Dir("Static/"))))
 	goji.Post("/api/login", login)
 	goji.Post("/api/getAllData", getData)
 	goji.Post("/api/register", registerHandle)
@@ -152,6 +152,9 @@ func main() {
 	goji.Get("/api/users", getAllUsers)
 	goji.Post("/api/users", registerUser)
 	goji.Post("/api/users/:userID/channels", addUserNotificationChannel)
+
+	goji.Get("/api/OathTokenRedirect", saveOauthToken)
+	goji.Get("/api/getoauthredirect/:userID", getOathToken)
 
 	goji.Serve()
 	//err := http.ListenAndServeTLS(":"+strconv.Itoa(*port), "server.pem", "server.key", nil)

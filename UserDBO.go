@@ -3,7 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
+	"strings"
 
+	"golang.org/x/oauth2"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -28,6 +30,33 @@ func addUser(toAdd *user) error {
 
 	fmt.Println("Done")
 	return nil
+}
+
+func saveCalendarToken(t *oauth2.Token, userID string) error {
+	fmt.Printf("Saving user: %s token string.", userID)
+
+	usr, err := getUserByID(userID)
+
+	check(err)
+
+	has := false
+
+	for i := range usr.NotificationChannels {
+		if strings.Compare(usr.NotificationChannels[i].NotificationType, "googlecalendar") == 0 {
+			usr.NotificationChannels[i].GoogleCalendarToken = *t
+			fmt.Printf("\n%s\n", "FOUND!")
+			break
+		}
+	}
+
+	if !has {
+		calendarChan := notificationChannel{ID: bson.NewObjectId(), Name: "googleCalendar", Description: "Google Calendar Insertion", NotificationType: "googlecalendar", GoogleCalendarToken: *t}
+		usr.NotificationChannels = append(usr.NotificationChannels, calendarChan)
+	}
+
+	err = updateUser(&usr)
+
+	return err
 }
 
 func getUserByID(userID string) (user, error) {

@@ -4,7 +4,10 @@
 	<link rel="stylesheet" href="css/navbar.css">
 	<link rel="stylesheet" href="css/login.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+	<script src="scripts/googleCal.js"></script>
 	<link rel="stylesheet" href="css/general.css">
+	<script src="https://apis.google.com/js/client.js">//?onload=checkAuth">
+	</script>
 </style>
 </head>
 <body>
@@ -19,8 +22,13 @@
 			<li><a href="register.html">Register</a></li>
 		</ul>
 	</div>
-	<div>
-
+	<div id="authorize-div" style="display: true">
+		<span>Authorize access to Google Calendar API</span>
+		<!--Button for the user to click to initiate auth sequence -->
+		<button id="authorize-button" onclick="handleAuthClick(event)">
+			Authorize
+		</button>
 	</div>
+	<pre id="output"></pre>
 </body>
 </html>
