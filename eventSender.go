@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,6 +12,8 @@ import (
 	"golang.org/x/net/context"
 )
 
+//There's got to be a better way to do this. But I can't think of it without
+//polymorphism
 func eventHandler(events <-chan eventFireInformation) {
 	fmt.Println("Starting event Handler...")
 
@@ -33,7 +36,7 @@ func eventHandler(events <-chan eventFireInformation) {
 			fmt.Printf("User found: %+v\n", user)
 			switch user.NotificationChannels[0].NotificationType {
 			case "webhook":
-				fireWebhoock(user.NotificationChannels[0], ev.occurance)
+				fireWebhook(user.NotificationChannels[0], ev.occurance)
 			case "googlecalendar":
 				addToGoogleCalendar(user.NotificationChannels[0], ev.occurance)
 			}
@@ -79,14 +82,12 @@ func addToGoogleCalendar(chanToSend notificationChannel, occurance eventOccuranc
 	fmt.Printf("Event created: %s\n", event.HtmlLink)
 }
 
-//There's got to be a better way to do this. But I can't think of it without
-//polymorphism
-func fireWebhoock(chanToSend notificationChannel, occurance eventOccurance) {
+func fireWebhook(chanToSend notificationChannel, occurance eventOccurance) {
 	fmt.Println("Firing Event.")
 	addr := chanToSend.Info[0]
 	fmt.Printf("Sending hoock to %s\n", addr)
-
+	bits, _ := json.Marshal(occurance.EventInformation)
 	//message to send. BASIC
 	//TODO: make this more polished. Figure out what needs to be actually sent.
-	http.Post(addr, "application/json", bytes.NewBufferString(occurance.EventInformation[0]))
+	http.Post(addr, "application/json", bytes.NewBuffer(bits))
 }
