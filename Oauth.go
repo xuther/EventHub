@@ -24,7 +24,7 @@ func getTokenFromWeb(user string, config *oauth2.Config) string {
 	return authURL
 }
 
-func getOathToken(c web.C, w http.ResponseWriter, r *http.Request) {
+func getOauthToken(c web.C, w http.ResponseWriter, r *http.Request) {
 
 	user := c.URLParams["userID"]
 

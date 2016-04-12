@@ -18,6 +18,19 @@ login = function(){
   loginCall(username,password)
 }
 
+function getUser() {
+  $ajax({
+    type: "GET",
+    url: "api/getUserInfo"
+    contentType: "application/json"
+  }).always(
+  function(data) {
+    console.log("What we got:")
+    console.log(data)
+    curUser = data
+  })
+}
+
 getData = function(){
   console.log("getting data")
 
@@ -54,7 +67,7 @@ loginCall = function(username, password)
    })
 }
 
-redirectToOauth = function(data) {
+redirectToOath = function(data) {
   //CHANGE FROM LOCALHOST
   window.location.href= 'https://foursquare.com/oauth2/authenticate' +
     "?client_id=5ATHFEOTK5EU23DGQXCJ4XHYF1OWTBDIIV2CHXBAYQN0X5IO"+
@@ -67,7 +80,7 @@ getToken = function() {
 
   $.ajax({
     type: "GET",
-    url: "api/getOauthToken" + window.location.search,
+    url: "api/getOathToken" + window.location.search,
     contentType: "application/json;charset=utf-8"
   }).always(
   function(data) {
