@@ -4,6 +4,8 @@
 
   var SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
 
+  var curUser
+
   /**
    * Check if current user has authorized this application.
    */
@@ -14,6 +16,17 @@
         'scope': SCOPES.join(' '),
         'immediate': true
       }, handleAuthResult);
+  }
+
+  function redirectToAuth() {
+    var address = $.ajax({
+      type: "GET",
+      url: "/api/getoauthredirect/" + curUser.userID
+    }).always(
+      function(data) {
+        window.location.href = data
+      }
+    )
   }
 
   /**
