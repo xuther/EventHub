@@ -35,6 +35,23 @@ func addProvider(prov *provider) error {
 	return nil
 }
 
+func removeEvent(eventID string) error {
+	session, err := mgo.Dial(configuration.MongoDBAddress)
+
+	if err != nil {
+		return err
+	}
+
+	defer session.Close()
+
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB(configuration.MongoProviderDBName).C("Providers")
+
+	c.Update(bson.M{"events._id": bson.ObjectIdHex(eventID)}, bson.M{"$pull": bson.M{"events": bson.M{"_id": bson.ObjectIdHex(eventID)}}})
+
+	return nil
+}
+
 func getEventByID(eventID string, providerID string) (event, error) {
 	fmt.Printf("\nGetting the event corresponding to ID: %s:%s \n", providerID, eventID)
 

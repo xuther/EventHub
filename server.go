@@ -145,10 +145,14 @@ func main() {
 	//actions for event registry
 	goji.Post("/api/providers", registerProvider)
 	goji.Get("/api/providers/:providerID", getProvider)
+
 	goji.Post("/api/providers/:providerID/events", registerEvent)
 	goji.Get("/api/providers/:providerID/events", getProviderEvents)
+
 	goji.Post("/api/providers/:providerID/events/:eventID/subscribe", subscribeToEvent)
 	goji.Post("/api/providers/:providerID/events/:eventID/fire", fireEvent)
+	goji.Delete("/api/providers/:providerID/events/:eventID", deleteEvent)
+
 	goji.Get("/api/providers", getAllProviders)
 
 	goji.Get("/api/users", getAllUsers)

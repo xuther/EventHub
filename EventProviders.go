@@ -98,6 +98,18 @@ func getProvider(c web.C, w http.ResponseWriter, r *http.Request) {
 
 }
 
+func deleteEvent(c web.C, w http.ResponseWriter, r *http.Request) {
+	eventID := c.URLParams["eventID"]
+
+	err := removeEvent(eventID)
+
+	if err != nil {
+		fmt.Fprintf(w, "Error: %s \n", err.Error())
+	} else {
+		fmt.Fprintf(w, "Success!")
+	}
+}
+
 func getProviderEvents(c web.C, w http.ResponseWriter, r *http.Request) {
 	providerID := c.URLParams["providerID"]
 
