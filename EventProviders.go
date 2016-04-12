@@ -79,6 +79,42 @@ func getAllProviders(c web.C, w http.ResponseWriter, r *http.Request) {
 	w.Write(s)
 }
 
+func getProvider(c web.C, w http.ResponseWriter, r *http.Request) {
+	providerID := c.URLParams["providerID"]
+
+	prov, err := getProviderByID(providerID)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "Error occured: %s\n", err.Error())
+		return
+	}
+
+	prov.Secret = ""
+
+	bits, err := json.Marshal(prov)
+
+	fmt.Fprintf(w, string(bits))
+
+}
+
+func getProviderEvents(c web.C, w http.ResponseWriter, r *http.Request) {
+	providerID := c.URLParams["providerID"]
+
+	prov, err := getProviderByID(providerID)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "Error occured: %s\n", err.Error())
+		return
+	}
+
+	bits, err := json.Marshal(prov.Events)
+
+	fmt.Fprintf(w, "%s", bits)
+
+}
+
 func registerEvent(c web.C, w http.ResponseWriter, r *http.Request) {
 	providerID := c.URLParams["providerID"]
 

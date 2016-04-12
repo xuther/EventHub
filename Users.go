@@ -11,6 +11,7 @@ import (
 
 	"github.com/zenazn/goji/web"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/oauth2"
 )
 
 func registerUser(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -126,6 +127,10 @@ func getAllUsers(c web.C, w http.ResponseWriter, r *http.Request) {
 
 	for indx := range users {
 		users[indx].Secret = ""
+		for indx2 := range users[indx].NotificationChannels {
+			users[indx].NotificationChannels[indx2].GoogleCalendarToken = oauth2.Token{}
+			users[indx].NotificationChannels[indx2].Info = nil
+		}
 	}
 
 	s, err := json.Marshal(users)
